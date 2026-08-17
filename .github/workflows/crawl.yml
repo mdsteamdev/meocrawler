@@ -2,7 +2,6 @@ name: Social Media Crawler Scheduled Run
 
 on:
   schedule:
-    # Runs every 3 days at 00:00 UTC
     - cron: '0 0 */3 * *'
   workflow_dispatch:
     inputs:
@@ -15,7 +14,7 @@ on:
         required: false
         default: 'facebook'
       search_term:
-        description: 'Keyword or Hashtag'
+        description: 'Keyword hoặc Hashtag'
         required: false
         default: '#SpiderMan'
 
@@ -32,16 +31,13 @@ jobs:
         with:
           node-version: 24
 
-      - name: 3. Install Npm dependencies
+      - name: 3. Cài đặt Npm dependencies
         run: npm ci
 
-      - name: 4. Install Playwright Chromium
-        run: npx playwright install --with-deps chromium
-
-      - name: 5. Execute Crawler Script with tsx
+      - name: 4. Thực thi Crawler Script
         env:
           CAMPAIGN_ID: ${{ github.event.inputs.campaign_id || 'SPIDER-MAN-2026' }}
           PLATFORM: ${{ github.event.inputs.platform || 'facebook' }}
           SEARCH_TERM: ${{ github.event.inputs.search_term || '#SpiderMan' }}
           APPS_SCRIPT_WEBAPP_URL: ${{ secrets.APPS_SCRIPT_WEBAPP_URL }}
-        run: npm run crawl
+        run: npx tsx scripts/run-crawler.ts
