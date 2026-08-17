@@ -4,7 +4,7 @@ on:
   schedule:
     # Tự động chạy mỗi 3 ngày vào lúc 00:00 UTC
     - cron: '0 0 */3 * *'
-  # Cho phép bấm nút kích hoạt thủ công trên giao diện web GitHub
+  # Nút bấm kích hoạt thủ công trên giao diện GitHub Actions
   workflow_dispatch:
     inputs:
       campaign_id:
@@ -26,17 +26,12 @@ jobs:
 
     steps:
       - name: 1. Checkout repository
-        uses: actions/checkout@v4.2.2
+        uses: actions/checkout@v4
 
-      - name: 2. Setup Node.js 24 Environment
-        uses: actions/setup-node@v4.2.0
-        with:
-          node-version: '24'
-
-      - name: 3. Cài đặt Npm dependencies
+      - name: 2. Cài đặt Npm dependencies
         run: npm install --no-package-lock
 
-      - name: 4. Thực thi Crawler Script
+      - name: 3. Thực thi Crawler Script
         env:
           CAMPAIGN_ID: ${{ github.event.inputs.campaign_id || 'SPIDER-MAN-2026' }}
           PLATFORM: ${{ github.event.inputs.platform || 'facebook' }}
