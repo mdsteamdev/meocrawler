@@ -2,7 +2,9 @@ name: Social Media Crawler Scheduled Run
 
 on:
   schedule:
+    # Tự động chạy mỗi 3 ngày vào lúc 00:00 UTC
     - cron: '0 0 */3 * *'
+  # Cho phép bấm nút kích hoạt thủ công trên giao diện web GitHub
   workflow_dispatch:
     inputs:
       campaign_id:
@@ -24,12 +26,12 @@ jobs:
 
     steps:
       - name: 1. Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2
 
-      - name: 2. Setup Node.js 24
-        uses: actions/setup-node@v4
+      - name: 2. Setup Node.js 24 Environment
+        uses: actions/setup-node@v4.2.0
         with:
-          node-version: 24
+          node-version: '24'
 
       - name: 3. Cài đặt Npm dependencies
         run: npm install --no-package-lock
