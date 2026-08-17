@@ -1,11 +1,28 @@
 import { UrlNormalizer } from '../src/utils/urlNormalizer';
 
 /**
- * Script chạy trực tiếp trong GitHub Actions Environment
- * Đóng vai trò thực thi quá trình crawler tự động
+ * Robust HTTP POST helper for Node.js 24 environment
  */
+async function sendToGoogleAppsScript(url: string, payload: object): Promise<void> {
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    });
+
+    console.log(`📩 Response status from Google Apps Script: ${response.status} ${response.statusText}`);
+    const text = await response.text();
+    console.log(`📩 Response body: ${text.substring(0, 300)}`);
+  } catch (error) {
+    console.error('⚠️ Warning: Failed to send data to Google Apps Script:', error);
+  }
+}
+
 async function runCrawlTask() {
-  console.log('🚀 [GitHub Actions] Bắt đầu tiến trình Crawler tự động...');
+  console.log('🚀 [GitHub Actions] Starting automated crawler runner...');
 
   const campaignId = process.env.CAMPAIGN_ID || 'SPIDER-MAN-2026';
   const platform = process.env.PLATFORM || 'facebook';
@@ -13,9 +30,9 @@ async function runCrawlTask() {
   const searchType = process.env.SEARCH_TYPE || 'HASHTAG';
   const runId = `RUN_GHActions_${Date.now()}`;
 
-  console.log(`📌 Chi tiết Task: Campaign=[${campaignId}] | Platform=[${platform}] | SearchTerm=[${searchTerm}]`);
+  console.log(`📌 Task Details: Campaign=[${campaignId}] | Platform=[${platform}] | SearchTerm=[${searchTerm}]`);
 
-  // Chuẩn hóa mẫu URL bài viết công khai
+  // Normalize post URL
   const sampleUrl = `https://www.${platform}.com/permalink/public_post_${Date.now()}`;
   const normalizedUrl = UrlNormalizer.normalizeUrl(sampleUrl, platform as any);
   const postId = UrlNormalizer.generatePostId(platform as any, normalizedUrl);
@@ -42,7 +59,7 @@ async function runCrawlTask() {
         postUrl: normalizedUrl,
         authorName: `${platform.toUpperCase()} Public Page`,
         authorUrl: `https://${platform}.com/page`,
-        postText: `Bài viết public thu thập tự động qua GitHub Actions cho từ khóa: ${searchTerm}`,
+        postText: `Automated post content collected via GitHub Actions for keyword: ${searchTerm}`,
         postedAt: new Date().toISOString(),
         collectedAt: new Date().toISOString(),
         likes: 250,
@@ -60,29 +77,26 @@ async function runCrawlTask() {
     ]
   };
 
-  console.log('✅ Kết quả crawler thu thập thành công:');
+  console.log('✅ Crawler output generated successfully:');
   console.log(JSON.stringify(resultData, null, 2));
 
-  // Gửi kết quả về Google Apps Script Web App (nếu có cấu hình URL)
+  // Send to Google Apps Script Web App if secret URL exists
   const webAppUrl = process.env.APPS_SCRIPT_WEBAPP_URL;
-  if (webAppUrl) {
-    console.log(`📡 Đang gửi dữ liệu về Google Apps Script Web App...`);
-    try {
-      const response = await fetch(webAppUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(resultData)
-      });
-      console.log(`📩 Phản hồi từ Google Apps Script: HTTP status ${response.status}`);
-    } catch (error) {
-      console.error('❌ Lỗi gửi dữ liệu về Google Apps Script:', error);
-    }
+  if (webAppUrl && webAppUrl.trim().length > 0) {
+    console.log(`📡 Sending results to Google Apps Script Web App...`);
+    await sendToGoogleAppsScript(webAppUrl, resultData);
   } else {
-    console.log('💡 Chưa cấu hình APPS_SCRIPT_WEBAPP_URL. Dữ liệu bài viết đã xuất ra log thành công.');
+    console.log('💡 APPS_SCRIPT_WEBAPP_URL is not set. Data output logged to console.');
   }
 }
 
-runCrawlTask().catch(err => {
-  console.error('❌ Fatal error trong GitHub Actions Runner:', err);
-  process.exit(1);
-});
+// Execute task with global error handling
+runCrawlTask()
+  .then(() => {
+    console.log('🎉 Task completed successfully!');
+    process.exit(0);
+  })
+  .catch((err) => {
+    console.error('❌ Critical error in GitHub Actions Runner:', err);
+    process.exit(1);
+  });
