@@ -1,7 +1,7 @@
 import { UrlNormalizer } from '../src/utils/urlNormalizer';
 
 /**
- * Robust HTTP POST helper for Node.js 24 environment
+ * Helper function to post JSON data to Google Apps Script Web App
  */
 async function sendToGoogleAppsScript(url: string, payload: object): Promise<void> {
   try {
@@ -15,7 +15,7 @@ async function sendToGoogleAppsScript(url: string, payload: object): Promise<voi
 
     console.log(`📩 Response status from Google Apps Script: ${response.status} ${response.statusText}`);
     const text = await response.text();
-    console.log(`📩 Response body: ${text.substring(0, 300)}`);
+    console.log(`📩 Response body sample: ${text.substring(0, 300)}`);
   } catch (error) {
     console.error('⚠️ Warning: Failed to send data to Google Apps Script:', error);
   }
