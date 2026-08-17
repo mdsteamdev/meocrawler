@@ -38,13 +38,10 @@ jobs:
       - name: 4. Install Playwright Chromium
         run: npx playwright install --with-deps chromium
 
-      - name: 5. Build TypeScript code
-        run: npm run build
-
-      - name: 6. Execute Crawler Script
+      - name: 5. Execute Crawler Script with tsx
         env:
           CAMPAIGN_ID: ${{ github.event.inputs.campaign_id || 'SPIDER-MAN-2026' }}
           PLATFORM: ${{ github.event.inputs.platform || 'facebook' }}
           SEARCH_TERM: ${{ github.event.inputs.search_term || '#SpiderMan' }}
           APPS_SCRIPT_WEBAPP_URL: ${{ secrets.APPS_SCRIPT_WEBAPP_URL }}
-        run: node dist/scripts/run-crawler.js
+        run: npm run crawl
