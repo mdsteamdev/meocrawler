@@ -2,9 +2,8 @@ name: Social Media Crawler Scheduled Run
 
 on:
   schedule:
-    # Tự động chạy mỗi 3 ngày vào lúc 00:00 UTC
+    # Runs every 3 days at 00:00 UTC
     - cron: '0 0 */3 * *'
-  # Cho phép bấm nút kích hoạt thủ công trực tiếp trên giao diện GitHub
   workflow_dispatch:
     inputs:
       campaign_id:
@@ -16,7 +15,7 @@ on:
         required: false
         default: 'facebook'
       search_term:
-        description: 'Keyword hoặc Hashtag'
+        description: 'Keyword or Hashtag'
         required: false
         default: '#SpiderMan'
 
@@ -25,24 +24,27 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: 1. Checkout Mã nguồn từ GitHub
+      - name: 1. Checkout repository
         uses: actions/checkout@v4
 
-      - name: 2. Cài đặt môi trường Node.js
+      - name: 2. Setup Node.js 24
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
 
-      - name: 3. Cài đặt các thư viện Npm
+      - name: 3. Install Npm dependencies
         run: npm ci
 
-      - name: 4. Cài đặt trình duyệt Playwright Chromium
+      - name: 4. Install Playwright Chromium
         run: npx playwright install --with-deps chromium
 
-      - name: 5. Thực thi Tiến trình Crawler
+      - name: 5. Build TypeScript code
+        run: npm run build
+
+      - name: 6. Execute Crawler Script
         env:
           CAMPAIGN_ID: ${{ github.event.inputs.campaign_id || 'SPIDER-MAN-2026' }}
           PLATFORM: ${{ github.event.inputs.platform || 'facebook' }}
           SEARCH_TERM: ${{ github.event.inputs.search_term || '#SpiderMan' }}
           APPS_SCRIPT_WEBAPP_URL: ${{ secrets.APPS_SCRIPT_WEBAPP_URL }}
-        run: npx ts-node scripts/run-crawler.ts
+        run: node dist/scripts/run-crawler.js
