@@ -32,7 +32,7 @@ jobs:
           node-version: 24
 
       - name: 3. Cài đặt Npm dependencies
-        run: npm ci
+        run: npm install --no-package-lock
 
       - name: 4. Thực thi Crawler Script
         env:
