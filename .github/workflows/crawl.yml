@@ -2,9 +2,7 @@ name: Social Media Crawler Scheduled Run
 
 on:
   schedule:
-    # Tự động chạy mỗi 3 ngày vào lúc 00:00 UTC
     - cron: '0 0 */3 * *'
-  # Nút bấm kích hoạt thủ công trên giao diện GitHub Actions
   workflow_dispatch:
     inputs:
       campaign_id:
@@ -31,7 +29,10 @@ jobs:
       - name: 2. Cài đặt Npm dependencies
         run: npm install --no-package-lock
 
-      - name: 3. Thực thi Crawler Script
+      - name: 3. Cài đặt trình duyệt ảo (Chromium)
+        run: npx playwright install --with-deps chromium
+
+      - name: 4. Thực thi Crawler Script
         env:
           CAMPAIGN_ID: ${{ github.event.inputs.campaign_id || 'SPIDER-MAN-2026' }}
           PLATFORM: ${{ github.event.inputs.platform || 'facebook' }}
