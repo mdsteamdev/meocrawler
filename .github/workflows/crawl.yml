@@ -8,20 +8,19 @@ on:
       campaign_id:
         description: 'Campaign ID'
         required: false
-        default: 'SPIDER-MAN-2026'
       platform:
-        description: 'Platform (facebook / tiktok / threads)'
+        description: 'Platform'
         required: false
-        default: 'facebook'
       search_term:
         description: 'Keyword hoặc Hashtag'
         required: false
-        default: '#SpiderMan'
+      start_date:
+        description: 'Ngày bắt đầu ưu tiên cào'
+        required: false
 
 jobs:
   run-crawler:
     runs-on: ubuntu-latest
-
     steps:
       - name: 1. Checkout repository
         uses: actions/checkout@v4
@@ -34,8 +33,9 @@ jobs:
 
       - name: 4. Thực thi Crawler Script
         env:
-          CAMPAIGN_ID: ${{ github.event.inputs.campaign_id || 'SPIDER-MAN-2026' }}
-          PLATFORM: ${{ github.event.inputs.platform || 'facebook' }}
-          SEARCH_TERM: ${{ github.event.inputs.search_term || '#SpiderMan' }}
+          CAMPAIGN_ID: ${{ github.event.inputs.campaign_id || 'MANUAL' }}
+          PLATFORM: ${{ github.event.inputs.platform || 'tiktok' }}
+          SEARCH_TERM: ${{ github.event.inputs.search_term || '#Test' }}
+          START_DATE: ${{ github.event.inputs.start_date || '' }}
           APPS_SCRIPT_WEBAPP_URL: ${{ secrets.APPS_SCRIPT_WEBAPP_URL }}
         run: npx tsx scripts/run-crawler.ts
